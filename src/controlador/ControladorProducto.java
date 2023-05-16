@@ -55,7 +55,7 @@ public class ControladorProducto {
         miProducto = miPanelProducto.empaquetarDatosProducto();
         miProductoDAO.registrarProducto(miProducto);
         miPanelProducto.setTablaProductos(miProductoDAO.listarProductos(), miCategoriaDAO.listarCategorias(), miProveedorDAO.listarProveedores());
-        miPanelProducto.limpiarCampos();
+        actualizarVista();
     }
     
     public void buscarProducto() {
@@ -66,15 +66,13 @@ public class ControladorProducto {
     public void modificarProducto() {
         miProducto = miPanelProducto.empaquetarDatosProducto();
         miProductoDAO.modificarProducto(miProducto);
-        miPanelProducto.setTablaProductos(miProductoDAO.listarProductos(), miCategoriaDAO.listarCategorias(), miProveedorDAO.listarProveedores());
-        miPanelProducto.limpiarCampos();
+        actualizarVista();
     }
     
     public void eliminarProducto() {
         idProducto = Integer.parseInt(miPanelProducto.txtIdProducto.getText());
         miProductoDAO.eliminarProducto(idProducto);
-        miPanelProducto.setTablaProductos(miProductoDAO.listarProductos(), miCategoriaDAO.listarCategorias(), miProveedorDAO.listarProveedores());
-        miPanelProducto.limpiarCampos();
+        actualizarVista();
     }
     
     public void cargarProductoSeleccionado() {
@@ -83,4 +81,13 @@ public class ControladorProducto {
         miPanelProducto.desempaquetarDatosProducto(miProductoDAO.buscarProducto(idProducto));
         miPanelProducto.txtIdProducto.requestFocus();
     }
+
+    private void actualizarVista() {
+    miPanelProducto.setTablaProductos(
+        miProductoDAO.listarProductos(),
+        miCategoriaDAO.listarCategorias(),
+        miProveedorDAO.listarProveedores()
+    );
+    miPanelProducto.limpiarCampos();
+}
 }
