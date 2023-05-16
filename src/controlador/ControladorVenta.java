@@ -121,14 +121,22 @@ public class ControladorVenta {
         }
         miPanelVentas.limpiarCamposPanelProducto();
     }
-
+    
+    
+    public void eliminarCarritoPedidos() {
+    int idVenta = miVentaDAO.generarIdVenta();
+    miPedidoDAO.listarCarritoPedidos(idVenta)
+            .forEach(pedido -> miPedidoDAO.eliminarPedido(pedido.getIdPedido()));
+    miPanelVentas.setTablaPedido(miPedidoDAO.listarCarritoPedidos(idVenta), miCategoriaDAO.listarCategorias());
+    }
+    /*
     public void eliminarCarritoPedidos() {
         ArrayList<Pedido> miCarritoPedidos = miPedidoDAO.listarCarritoPedidos(miVentaDAO.generarIdVenta());
         miCarritoPedidos.forEach((var pedido) -> {
             miPedidoDAO.eliminarPedido(pedido.getIdPedido());
         });
         miPanelVentas.setTablaPedido(miPedidoDAO.listarCarritoPedidos(miVentaDAO.generarIdVenta()), miCategoriaDAO.listarCategorias());
-    }
+    }*/
 
     public void modificarPedido() {
         if (!"".equals(miPanelVentas.txtCantProd.getText())) {
