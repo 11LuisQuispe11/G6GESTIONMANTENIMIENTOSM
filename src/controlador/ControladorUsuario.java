@@ -1,70 +1,100 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controlador;
 
 import modelo.vo.Usuario;
 import modelo.dao.UsuarioDAO;
 import vista.PanelUsuarios;
 
-/**
- *
- * @author krypt97
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
 public class ControladorUsuario {
 
-    // ATRIBUTOS DE CLASE
     private PanelUsuarios miPanelUsuarios;
-    private UsuarioDAO miUsuarioDAO;
+    private UsuarioDAO miUsuarioDAO = UsuarioDAO.getInstancia();
     private Usuario miUsuario;
-    private String dniUsuario;
+    private List<Usuario> listaUsuarios;
 
-    // ENLACE VISTA
     public void setPanelUsuarios(PanelUsuarios miPanelUsuarios) {
         this.miPanelUsuarios = miPanelUsuarios;
     }
 
-    // ENLACE MODELO
-    // Dao
-    public void setUsuarioDAO(UsuarioDAO miUsuarioDAO) {
-        this.miUsuarioDAO = miUsuarioDAO;
-    }
-
-    // MÉTODOS DE CLASE
     public void registrarUsuario() {
         miUsuario = miPanelUsuarios.empaquetarDatosUsuario();
         miUsuarioDAO.registrarUsuario(miUsuario);
-        miPanelUsuarios.setTablaUsuarios(miUsuarioDAO.listarUsuarios());
+        listaUsuarios = miUsuarioDAO.listarUsuarios();
+        miPanelUsuarios.setTablaUsuarios(listaUsuarios);
         miPanelUsuarios.limpiarCampos();
     }
 
     public void eliminarUsuario() {
-        dniUsuario = miPanelUsuarios.txtDni.getText();
+        String dniUsuario = miPanelUsuarios.txtDni.getText();
         miUsuarioDAO.eliminarUsuario(dniUsuario);
-        miPanelUsuarios.setTablaUsuarios(miUsuarioDAO.listarUsuarios());
+        listaUsuarios = miUsuarioDAO.listarUsuarios();
+        miPanelUsuarios.setTablaUsuarios(listaUsuarios);
         miPanelUsuarios.limpiarCampos();
     }
 
     public void modificarUsuario() {
         miUsuario = miPanelUsuarios.empaquetarDatosUsuario();
         miUsuarioDAO.modificarUsuario(miUsuario);
-        miPanelUsuarios.setTablaUsuarios(miUsuarioDAO.listarUsuarios());
+        listaUsuarios = miUsuarioDAO.listarUsuarios();
+        miPanelUsuarios.setTablaUsuarios(listaUsuarios);
         miPanelUsuarios.limpiarCampos();
     }
 
     public void buscarUsuario() {
-        dniUsuario = miPanelUsuarios.txtDni.getText();
-        if (miUsuarioDAO.buscarUsuario(dniUsuario) != null) {
-            miPanelUsuarios.desempaquetarDatosUsuario(miUsuarioDAO.buscarUsuario(dniUsuario));
+        String dniUsuario = miPanelUsuarios.txtDni.getText();
+        Usuario usuario = miUsuarioDAO.buscarUsuario(dniUsuario);
+        if (usuario != null) {
+            miPanelUsuarios.desempaquetarDatosUsuario(usuario);
         }
     }
 
     public void cargarUsuarioSeleccionado() {
-        dniUsuario = miPanelUsuarios.dniSeleccionado();
+        String dniUsuario = miPanelUsuarios.dniSeleccionado();
         miPanelUsuarios.txtDni.setText(dniUsuario);
         miPanelUsuarios.desempaquetarDatosUsuario(miUsuarioDAO.buscarUsuario(dniUsuario));
         miPanelUsuarios.txtDni.requestFocus();
+    }
+
+    public static void main(String[] args) {
+        PanelUsuarios panelUsuarios = new PanelUsuarios();
+        ControladorUsuario controladorUsuario = new ControladorUsuario();
+        controladorUsuario.setPanelUsuarios(panelUsuarios);
+        panelUsuarios.setControlador(controladorUsuario);
+
+        panelUsuarios.btnRegistrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                controladorUsuario.registrarUsuario();
+            }
+        });
+
+        panelUsuarios.btnEliminar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                controladorUsuario.eliminarUsuario();
+            }
+        });
+
+        panelUsuarios.btnModificar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                controladorUsuario.modificarUsuario();
+            }
+        });
+
+        panelUsuarios.btnBuscar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                controladorUsuario.buscarUsuario();
+            }
+        });
+
+        panelUsuarios.tablaUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                controladorUsuario.cargarUsuarioSeleccionado();
+            }
+        });
+
+        // Resto del código para configurar la interfaz de usuario y ejecutar la aplicación
+        // ...
     }
 }
