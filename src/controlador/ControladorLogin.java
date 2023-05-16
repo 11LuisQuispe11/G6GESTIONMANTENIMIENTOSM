@@ -15,83 +15,46 @@ import vista.VentanaPrincipal;
  *
  * @author krypt97
  */
-public class ControladorLogin {
-
-    // ATRIBUTOS DE CLASE
-    private VentanaLogin miVentanaLogin;
-    private VentanaPrincipal miVentanaPrincipal;
-    private UsuarioDAO miUsuarioDAO;
-    private Usuario miUsuario; // usuario principal del main
-    private Usuario miUsuarioBuscado; // Variable necesaria para setear el usuario principal del main
-    private String username;
-    private String password;
-
-    // ENLACE VISTA
-    public void setVentanaLogin(VentanaLogin miVentanaLogin) {
+ // CONSTRUCTOR
+    public ControladorLogin(VentanaLogin miVentanaLogin, VentanaPrincipal miVentanaPrincipal, UsuarioDAO miUsuarioDAO) {
         this.miVentanaLogin = miVentanaLogin;
-    }
-
-    public void setVentanaPrincipal(VentanaPrincipal miVentanaPrincipal) {
         this.miVentanaPrincipal = miVentanaPrincipal;
-    }
-
-    // ENLACE MODELO
-    // Vo
-    public void setUsuario(Usuario miUsuario) { // Usuario (vendedor) unico por cada login
-        this.miUsuario = miUsuario;
-    }
-
-    // Dao
-    public void setUsuarioDAO(UsuarioDAO miUsuarioDAO) {
         this.miUsuarioDAO = miUsuarioDAO;
     }
 
-    // MÉTODOS DE CLASE
+    // MÉTODO PARA INICIAR SESIÓN
     public void logearUsuario() {
         username = miVentanaLogin.getUsername();
         password = miVentanaLogin.getPassword();
         miUsuarioBuscado = miUsuarioDAO.buscarUsuarioUsername(username);
-        if (miUsuarioBuscado != null) {
-            if (username.equals(miUsuarioBuscado.getUsername())) {
-                if (password.equals(miUsuarioBuscado.getPassword())) {
-                    // Setea usuario principal del main
-                    miUsuario.setDniUsuario(miUsuarioBuscado.getDniUsuario());
-                    miUsuario.setUsername(username);
-                    miUsuario.setPassword(password);
-                    miUsuario.setRol(miUsuarioBuscado.getRol());
-                    // Intercambia ventanas
-                    miVentanaLogin.setVisible(false);
-                    miVentanaPrincipal.setVisible(true);
-                    miVentanaPrincipal.panelHome.setVisible(true);
-                    validarPermisoUsuario();
-                } else {
-                    JOptionPane.showMessageDialog(null, "La contraseña proporcionada es incorrecta");
-                }
-            }
+        if (miUsuarioBuscado != null && username.equals(miUsuarioBuscado.getUsername()) && password.equals(miUsuarioBuscado.getPassword())) {
+            // Setea usuario principal del main
+            miUsuario = new Usuario(miUsuarioBuscado.getDniUsuario(), username, password, miUsuarioBuscado.getRol()); // crear un nuevo Usuario en lugar de establecer sus atributos uno por uno
+            // Intercambia ventanas
+            miVentanaLogin.setVisible(false);
+            miVentanaPrincipal.setVisible(true);
+            miVentanaPrincipal.panelHome.setVisible(true);
+            validarPermisoUsuario();
         } else {
-            JOptionPane.showMessageDialog(null, "Usuario no registrado");
+            JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos"); // se puede mostrar un mensaje más genérico para mejorar la seguridad
         }
         miVentanaLogin.limpiarCampos();        
     }
 
+    // MÉTODO PARA CERRAR LA APLICACIÓN
     public void cerrarAplicacion() {
         System.exit(0);
     }
 
+    // MÉTODO PARA VALIDAR EL PERMISO DEL USUARIO
     public void validarPermisoUsuario() {
         String rol = miUsuario.getRol();
-        if (rol.equalsIgnoreCase("VENDEDOR")) {
-            miVentanaPrincipal.btnUsuarios.setVisible(false);
-            setLayoutBotonesVentanaPrincipal(5, 35);
-        } else {
-            miVentanaPrincipal.btnUsuarios.setVisible(true);
-            setLayoutBotonesVentanaPrincipal(5, 24);
-        }
+        miVentanaPrincipal.btnUsuarios.setVisible(!rol.equalsIgnoreCase("VENDEDOR")); // usar ! en lugar de if else para simplificar el código
+        setLayoutBotonesVentanaPrincipal(5, rol.equalsIgnoreCase("VENDEDOR") ? 35 : 24); // usar un operador ternario para simplificar el código
     }
 
-    public void setLayoutBotonesVentanaPrincipal(int ver,int hor) {
-        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, ver, hor);
-        flowLayout1.setAlignOnBaseline(true);
-        miVentanaPrincipal.panLatBtns.setLayout(flowLayout1);
+    // MÉTODO PARA ESTABLECER EL LAYOUT DE LOS BOTONES EN LA VENTANA PRINCIPAL
+    public void setLayoutBotonesVentanaPrincipal(int ver, int hor) {
+        miVentanaPrincipal.panLatBtns.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, ver, hor)); // no es necesario crear una nueva instancia de FlowLayout cada vez que se llama a este método
     }
 }
